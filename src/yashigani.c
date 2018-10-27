@@ -109,9 +109,8 @@ main ( int argc, char *argv [ ] )
         - permission events before opening files
         - notification events after closing a write-enabled
           file descriptor */
-    //if ( fanotify_mark ( fd, FAN_MARK_ADD | FAN_MARK_MOUNT,
-    //            FAN_OPEN_PERM | FAN_CLOSE_WRITE, AT_FDCWD,
-    if ( fanotify_mark ( fd, FAN_OPEN_PERM,
+    if ( fanotify_mark ( fd, FAN_MARK_ADD | FAN_MARK_MOUNT,
+                FAN_OPEN_PERM | FAN_CLOSE_WRITE, AT_FDCWD,
                 AT_FDCWD,
                 argv [ 1 ] ) == -1 )
     {
