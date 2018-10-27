@@ -3,8 +3,8 @@ CFLAGS        = -O2 -Wall
 DEST          = /usr/sbin
 LDFLAGS       =
 LIBS          =
-OBJS          = fanotify.o
-PROGRAM       = fanotify 
+OBJS          = yashigani.o
+PROGRAM       = yashigani 
 
 all:            $(PROGRAM)
 
