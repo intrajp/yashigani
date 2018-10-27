@@ -1,4 +1,3 @@
-#define _GNU_SOURCE     /* Needed to get O_LARGEFILE definition */
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
