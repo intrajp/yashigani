@@ -114,7 +114,7 @@ main ( int argc, char *argv [ ] )
                 argv [ 1 ] ) == -1 )
     {
         perror ( "fanotify_mark" );
-        printf("errno:\n",errno);
+        printf("errno:%d\n",errno);
         exit ( EXIT_FAILURE );
     }
     /* Prepare for polling */
