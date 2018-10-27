@@ -93,7 +93,7 @@ main ( int argc, char *argv [ ] )
     if ( argc != 2 )
     {
         fprintf(stderr, "Usage: %s MOUNT\n", argv[0]);
-        exit(EXIT_FAILURE);
+        exit ( EXIT_FAILURE );
     }
     printf("Press enter key to terminate.\n");
     /* Create the file descriptor for accessing the fanotify API */
@@ -102,8 +102,8 @@ main ( int argc, char *argv [ ] )
                               O_RDONLY | O_LARGEFILE );
     if ( fd == -1 )
     {
-        perror("fanotify_init");
-        exit(EXIT_FAILURE);
+        perror ( "fanotify_init" );
+        exit ( EXIT_FAILURE );
     }
     /* Mark the mount for:
         - permission events before opening files
@@ -114,6 +114,7 @@ main ( int argc, char *argv [ ] )
                 argv [ 1 ] ) == -1 )
     {
         perror ( "fanotify_mark" );
+        printf("errno:\n",errno);
         exit ( EXIT_FAILURE );
     }
     /* Prepare for polling */
