@@ -1,0 +1,8 @@
+config BR2_PACKAGE_YASHIGANI
+	bool "yashigani"
+	help
+	  This software notify system activity by White List
+
+	  https://github.com/intrajp/yashigani
+
+comment "yashigani is cool"
