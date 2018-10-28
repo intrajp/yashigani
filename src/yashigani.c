@@ -101,7 +101,8 @@ main ( int argc, char *argv [ ] )
 
     fd = fanotify_init ( FAN_CLOEXEC | FAN_CLASS_CONTENT | FAN_NONBLOCK,
                               //O_RDONLY | O_LARGEFILE );
-                              O_RDONLY );
+                              0 );
+    printf("debug - fd:%d\n",fd);
     if ( fd == -1 )
     {
         perror ( "fanotify_init" );
@@ -116,7 +117,7 @@ main ( int argc, char *argv [ ] )
                 argv [ 1 ] ) == -1 )
     {
         perror ( "fanotify_mark" );
-        printf("errno:%d\n",errno);
+        printf("debug - errno:%d\n",errno);
         exit ( EXIT_FAILURE );
     }
     /* Prepare for polling */
