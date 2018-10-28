@@ -100,7 +100,8 @@ main ( int argc, char *argv [ ] )
     /* Create the file descriptor for accessing the fanotify API */
 
     fd = fanotify_init ( FAN_CLOEXEC | FAN_CLASS_CONTENT | FAN_NONBLOCK,
-                              O_RDONLY | O_LARGEFILE );
+                              //O_RDONLY | O_LARGEFILE );
+                              O_RDONLY );
     if ( fd == -1 )
     {
         perror ( "fanotify_init" );
