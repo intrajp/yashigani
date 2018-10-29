@@ -100,7 +100,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_yashigani_OBJECTS = yashigani.$(OBJEXT)
+am_yashigani_OBJECTS = main.$(OBJEXT) yashigani.$(OBJEXT)
 yashigani_OBJECTS = $(am_yashigani_OBJECTS)
 yashigani_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -252,7 +252,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXFLAGS = $(INIT_CFLAGS)
-yashigani_SOURCES = yashigani.c
+yashigani_SOURCES = main.c yashigani.c
 all: all-am
 
 .SUFFIXES:
@@ -339,6 +339,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/yashigani.Po@am__quote@
 
 .c.o:

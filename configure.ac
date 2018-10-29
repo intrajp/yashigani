@@ -28,7 +28,7 @@ version 2.1 of the License, or (at your option) any later version. See the
 configure.ac file for more details.])
 
 # initialize and set version and bugreport address
-AC_INIT([yashigani], [0.0.5], [shintaro.fujiwara@gmail.com])
+AC_INIT([yashigani], [0.0.19], [shintaro.fujiwara@gmail.com])
 RELEASE_MONTH="Oct 2018"
 AC_SUBST(RELEASE_MONTH)
 AC_CONFIG_MACRO_DIR([m4])
@@ -36,7 +36,7 @@ AC_CONFIG_MACRO_DIR([m4])
 # display notice and initialize automake
 AC_MSG_NOTICE([configuring AC_PACKAGE_TARNAME AC_PACKAGE_VERSION])
 AM_INIT_AUTOMAKE([1.11.2 --warnings=all])
-AC_CONFIG_SRCDIR([src/yashigani.c])
+AC_CONFIG_SRCDIR([src/main.c])
 
 # create a config.h file (Automake will add -DHAVE_CONFIG_H)
 #AC_CONFIG_HEADERS([config.h])
