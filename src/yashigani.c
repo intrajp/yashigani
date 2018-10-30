@@ -20,9 +20,10 @@
  *  02110-1301 USA
  */
 
-//#define _GNU_SOURCE     /* Needed to get O_LARGEFILE definition */
 #include <limits.h>
+#include <string.h>
 #include "common.h"
+char path_name_ok [ PATH_MAX ];
 
 /* Read all available fanotify events from the file descriptor 'fd' */
 
@@ -33,12 +34,14 @@ void handle_events ( int fd )
     ssize_t len;
     struct fanotify_response response;
     struct stat info; /* for check_executable() */
-    int executable; /* for check_executable() */
+    int executable = 0; /* for check_executable() */
     executable = 0; /* setting no executable */
-    const char *path_echo;
+    const char *path_echo = "";
+    const char *sig_echo = "";
 
     /* Loop while events can be read from fanotify file descriptor */
-    for( ; ; ) {
+    for( ; ; )
+    {
         /* Read some events */
         len = read ( fd, ( void * ) &buf, sizeof ( buf ) );
         if ( len == -1 && errno != EAGAIN )
@@ -52,9 +55,9 @@ void handle_events ( int fd )
         /* Point to the first event in the buffer */
         metadata = buf;
         /* Loop over all events in the buffer */
-        while ( FAN_EVENT_OK(metadata, len ) )
+        while ( FAN_EVENT_OK ( metadata, len ) )
         {
-        /* Check that run-time and compile-time structures match */
+            /* Check that run-time and compile-time structures match */
             if ( metadata->vers != FANOTIFY_METADATA_VERSION )
             {
                 fprintf(stderr,
@@ -64,19 +67,47 @@ void handle_events ( int fd )
             /* metadata->fd contains either FAN_NOFD, indicating a
                queue overflow, or a file descriptor (a nonnegative
                integer). Here, we simply ignore queue overflow. */
+
             if ( metadata->fd >= 0 )
             {
                 ////////////////////////////////////////////
                 /* check fd is executable or not */
                 executable = check_executable ( metadata->fd , &info );
+		printf ("executable:%d\n",executable);
 		path_echo = get_path_name ( metadata->fd );
-                //calc_hash ( path_echo );
+                /* calculate hash of path */
+                sig_echo = calc_hash ( path_echo );
 
                 /* setting deny if fd is executable */
 		if ( executable )
-                    response.response = FAN_ALLOW;
+                {
+                    /* check with the white-list */
+                    if ( search_sig_and_path ( sig_echo, path_echo ) )
+		    {
+                        printf("FAN_ALLOW\n");
+                        response.response = FAN_ALLOW; /* allow if path is in the list */
+                        strncpy ( path_name_ok , path_echo, PATH_MAX - 1 );
+                        printf("path_name_ok:%s\n",path_name_ok);
+		    }
+		    else
+		    {
+                        printf("path_name_ok2:%s\n",path_name_ok);
+                        if ( ( strcmp ( path_name_ok, "" )  != 0 ) || ( search_sig_and_path ( sig_echo, path_name_ok ) ) )
+                        {
+                            printf("FAN_ALLOW\n");
+                            response.response = FAN_ALLOW; /* allow if path is not in the list */
+                            printf("path_name_ok3:%s\n",path_name_ok);
+                            path_name_ok [ 0 ]= '\0';
+                        }
+                        else
+                        {
+                            printf("FAN_DENY\n");
+                            response.response = FAN_DENY; /* deny if path is in the list */
+                        }
+		    }
+                }
 		else
-                    response.response = FAN_DENY;
+                    response.response = FAN_ALLOW; /* allow if not executable */
 	        ////////////////////////////////////////////
 
                 /* Handle open permission event */
@@ -92,7 +123,6 @@ void handle_events ( int fd )
                 /* Handle closing of writable file event */
                 if ( metadata->mask & FAN_CLOSE_WRITE )
                     printf("FAN_CLOSE_WRITE: ");
-		path_echo = get_path_name ( metadata->fd );
                 printf("File %s\n", path_echo);
                 close ( metadata->fd );
             }

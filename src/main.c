@@ -20,6 +20,7 @@
  *  02110-1301 USA
  */
 
+//#define _GNU_SOURCE     /* Needed to get O_LARGEFILE definition */
 #include <poll.h>
 #include "common.h" 
 
@@ -41,13 +42,11 @@ int main ( int argc, char *argv [ ] )
 
     fd = fanotify_init ( FAN_CLOEXEC | FAN_CLASS_CONTENT | FAN_NONBLOCK,
                               O_RDONLY | O_LARGEFILE );
-    printf("debug - fd:%d\n",fd);
     if ( fd == -1 )
     {
         perror ( "fanotify_init" );
         exit ( EXIT_FAILURE );
     }
-
 
     /* Mark the mount for:
         - permission events before opening files
@@ -69,6 +68,7 @@ int main ( int argc, char *argv [ ] )
     /* Fanotify input */
     fds [ 1 ].fd = fd;
     fds [ 1 ].events = POLLIN;
+
     /* This is the loop to wait for incoming events */
     printf("Listening for events.\n");
     while ( 1 )
@@ -91,8 +91,10 @@ int main ( int argc, char *argv [ ] )
                 break;
             }
             if ( fds [ 1 ].revents & POLLIN )
+	    {
                 /* Fanotify events are available */
-                handle_events(fd);
+                handle_events( fd );
+	    }
         }
     }
     printf("Listening for events stopped.\n");

@@ -20,15 +20,69 @@
  *  02110-1301 USA
  */
 
+#include <ctype.h> /* for is_space */
+#include <errno.h>
 #include <string.h>
 #include <limits.h>
 #include <time.h> 
 #include <unistd.h> 
+#include <openssl/sha.h>
+#include <openssl/rand.h>
 #include "common.h"
 
 char procfd_path_echo [ PATH_MAX ];
+char buff [ 4096 + 1 ];
 
-int  check_executable ( int fd, struct stat *buf )
+int search_sig_and_path ( const char *sig, const char *path )
+{
+
+    FILE *fp;
+    int lnr = 0;
+    struct stat;
+    char linebuf [ 4096 ];
+    char *line;
+    int i;
+
+    /* change this to full path string */
+    const char *sig_file_name = "./tests/sig_bin_all";
+
+    /* open file */
+    if ( ( fp=fopen ( sig_file_name, "r" ) ) == NULL )
+    {
+        printf("can't open file (%s): %s\n",sig_file_name,strerror(errno));
+        exit ( EXIT_FAILURE );
+    }
+
+    /* read file and parse lines */
+    while ( fgets ( linebuf, sizeof ( linebuf ), fp ) != NULL )
+    {
+        lnr++;
+        line = linebuf;
+        /* strip newline */
+        i = ( int ) strlen ( line );
+        if ( ( i <= 0 ) || ( line [ i - 1 ] != '\n' ) )
+        {
+            printf("%s:%d: line too long or last line missing newline\n",sig_file_name,lnr);
+            exit ( EXIT_FAILURE );
+        }
+        /* this for compare rightly */
+        line [ i - 1 ] = '\0';
+        if ( strcmp ( line, path ) == 0 )
+	{
+            return ( 1 );
+        }
+        line [ i - 1 ] = '\0';
+        /* strip trailing spaces */
+        for ( i--; ( i > 0 ) && isspace ( line [ i -1 ] ) ; i-- )
+            line [ i -1 ] = '\0';
+    }
+    /* after reading all lines, close the file pointer */
+    fclose ( fp );
+
+    return ( 0 );
+}
+
+int check_executable ( int fd, struct stat *buf )
 {
     if ( fstat ( fd, buf ) != 0 )
     {
@@ -39,12 +93,12 @@ int  check_executable ( int fd, struct stat *buf )
     {
         if ( buf->st_mode & S_IXUSR )
         {
-            puts ("executable");   
+            //puts ("executable");   
 	    return ( 1 );
         }
 	else
             puts ("no");   
-	/*
+/*
         puts ("fstat() returned:");   
         printf ("inode:%d\n",(int)buf->st_ino);   
         printf ("dev id:%d\n",(int)buf->st_dev);   
@@ -52,23 +106,30 @@ int  check_executable ( int fd, struct stat *buf )
         printf ("links:%d\n",(int)buf->st_nlink);   
         printf ("uid:%d\n",(int)buf->st_uid);   
         printf ("gid:%d\n",(int)buf->st_gid);   
-	*/
+*/
     }
 
     return ( 0 );
 }
 
-void calc_hash ( const char *path )
+const char *showHexString( unsigned char *hex, size_t n )
 {
-    int err = 0;
-    char buff [ PATH_MAX ];
-    memset ( buff, '\0', PATH_MAX ); 
-    snprintf ( buff, PATH_MAX, "sha256sum %s", path );
-    err = system ( buff );
-    if ( err )
-        fprintf(stderr, "command failed: %s (%d)\n", buff, err);    
-    else
-        printf("%s",buff);
+    char buff2 [ n + 1 ];
+    for ( size_t i = 0; i < n; i++ )
+    {
+	snprintf ( buff2, n, "%02x", hex[i]);
+	strncpy ( buff, buff2, PATH_MAX );
+    }
+    return buff;
+}
+
+const char *calc_hash ( const char *path )
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256( (unsigned char *)path, strlen(path), hash );
+    showHexString( hash, SHA256_DIGEST_LENGTH );
+
+    return buff;
 }
 
 const char *get_path_name ( int fd )
