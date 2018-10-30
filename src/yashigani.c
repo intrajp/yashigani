@@ -31,10 +31,12 @@ void handle_events ( int fd )
     const struct fanotify_event_metadata *metadata;
     struct fanotify_event_metadata buf [ 200 ];
     ssize_t len;
-    char path [ PATH_MAX ];
-    ssize_t path_len;
-    char procfd_path [ PATH_MAX ];
     struct fanotify_response response;
+    struct stat info; /* for check_executable() */
+    int executable; /* for check_executable() */
+    executable = 0; /* setting no executable */
+    const char *path_echo;
+
     /* Loop while events can be read from fanotify file descriptor */
     for( ; ; ) {
         /* Read some events */
@@ -64,32 +66,34 @@ void handle_events ( int fd )
                integer). Here, we simply ignore queue overflow. */
             if ( metadata->fd >= 0 )
             {
+                ////////////////////////////////////////////
+                /* check fd is executable or not */
+                executable = check_executable ( metadata->fd , &info );
+		path_echo = get_path_name ( metadata->fd );
+                //calc_hash ( path_echo );
+
+                /* setting deny if fd is executable */
+		if ( executable )
+                    response.response = FAN_ALLOW;
+		else
+                    response.response = FAN_DENY;
+	        ////////////////////////////////////////////
+
                 /* Handle open permission event */
                 if ( metadata->mask & FAN_OPEN_PERM )
                 {
                     printf("FAN_OPEN_PERM: ");
                     /* Allow file to be opened */
                     response.fd = metadata->fd;
-                    response.response = FAN_ALLOW;
+                    //response.response = FAN_ALLOW;
                     write ( fd, &response,
                           sizeof ( struct fanotify_response ) );
                 }
                 /* Handle closing of writable file event */
                 if ( metadata->mask & FAN_CLOSE_WRITE )
                     printf("FAN_CLOSE_WRITE: ");
-                /* Retrieve and print pathname of the accessed file */
-                snprintf ( procfd_path, sizeof ( procfd_path ),
-                         "/proc/self/fd/%d", metadata->fd );
-                path_len = readlink ( procfd_path, path,
-                                    sizeof ( path ) - 1 );
-                if ( path_len == -1 )
-                { 
-                    perror("readlink");
-                    exit(EXIT_FAILURE);
-                }
-                path [ path_len ] = '\0';
-                printf("File %s\n", path);
-                /* Close the file descriptor of the event */
+		path_echo = get_path_name ( metadata->fd );
+                printf("File %s\n", path_echo);
                 close ( metadata->fd );
             }
             /* Advance to next event */

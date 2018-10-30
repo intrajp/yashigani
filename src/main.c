@@ -29,6 +29,7 @@ int main ( int argc, char *argv [ ] )
     int fd, poll_num;
     nfds_t nfds;
     struct pollfd fds [ 2 ];
+
     /* Check mount point is supplied */
     if ( argc != 2 )
     {
@@ -46,6 +47,8 @@ int main ( int argc, char *argv [ ] )
         perror ( "fanotify_init" );
         exit ( EXIT_FAILURE );
     }
+
+
     /* Mark the mount for:
         - permission events before opening files
         - notification events after closing a write-enabled

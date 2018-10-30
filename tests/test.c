@@ -20,57 +20,23 @@
  *  02110-1301 USA
  */
 
-#include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/fanotify.h>
-#include <sys/stat.h> /* for check executable */
-#include <sys/types.h> /* for check executable */
-#include <unistd.h>
+#include <string.h>
+#include <limits.h>
+#include <time.h> 
+#include <unistd.h> 
 
-
-/*
- * handle_events
- *
- * This function handle events
- *
- * Caller main.c
- *
- * Calls
- */
-void  handle_events ( int fd );
-
-/*
- * check_executable 
- *
- * This function checks fd and return 0 
- * if it's executable, if not, return -1 
- *
- * Caller main.c
- *
- * Calls
- */
-int  check_executable ( int fd, struct stat *buf );
-
-/*
- * calc_hash 
- *
- * This function returns hash 
- *
- * Caller main.c
- *
- * Calls
- */
-void calc_hash ( const char *path );
-
-/*
- * get_path 
- *
- * This function returns file path from fd 
- *
- * Caller yashigani.c
- *
- * Calls
- */
-const char *get_path_name ( int fd );
+int main ( int argc, char *argv [ ] )
+{
+    const char *path = "/bin/ab";
+    int err = 0;
+    char buff [ PATH_MAX ];
+    memset ( buff, '\0', PATH_MAX ); 
+    snprintf ( buff, PATH_MAX, "sha256sum %s", path );
+    err = system ( buff );
+    if ( err )
+        fprintf(stderr, "command failed: %s (%d)\n", buff, err);    
+    else
+        printf("%s",buff);
+}

@@ -1,10 +1,12 @@
 # Makefile.am - use automake to generate Makefile.in
 
-bin_PROGRAMS = yashigani 
-
+CC = gcc
 AM_CXFLAGS = $(INIT_CFLAGS)
+AM_LDFLAGS = -lcrypto 
 
-yashigani_SOURCES = main.c yashigani.c
+yashigani_SOURCES = main.c yashigani.c common.c
+
+bin_PROGRAMS = yashigani 
 
 all:
 
