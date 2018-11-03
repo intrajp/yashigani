@@ -33,7 +33,7 @@
 char procfd_path_echo [ PATH_MAX ];
 char buff [ 4096 + 1 ];
 
-int search_sig_and_path ( const char *sig, const char *path )
+int search_sig_and_path ( const char *sig, const char *path, const char *searchfile )
 {
 
     FILE *fp;
@@ -43,13 +43,10 @@ int search_sig_and_path ( const char *sig, const char *path )
     char *line;
     int i;
 
-    /* change this to full path string */
-    const char *sig_file_name = "./tests/sig_bin_all";
-
     /* open file */
-    if ( ( fp=fopen ( sig_file_name, "r" ) ) == NULL )
+    if ( ( fp=fopen ( searchfile, "r" ) ) == NULL )
     {
-        printf("can't open file (%s): %s\n",sig_file_name,strerror(errno));
+        printf("can't open file (%s): %s\n",searchfile,strerror(errno));
         exit ( EXIT_FAILURE );
     }
 
@@ -62,7 +59,7 @@ int search_sig_and_path ( const char *sig, const char *path )
         i = ( int ) strlen ( line );
         if ( ( i <= 0 ) || ( line [ i - 1 ] != '\n' ) )
         {
-            printf("%s:%d: line too long or last line missing newline\n",sig_file_name,lnr);
+            printf("%s:%d: line too long or last line missing newline\n",searchfile,lnr);
             exit ( EXIT_FAILURE );
         }
         /* this for compare rightly */
@@ -96,8 +93,8 @@ int check_executable ( int fd, struct stat *buf )
             //puts ("executable");   
 	    return ( 1 );
         }
-	else
-            puts ("no");   
+	////else
+            ////puts ("no");   
 /*
         puts ("fstat() returned:");   
         printf ("inode:%d\n",(int)buf->st_ino);   
@@ -112,12 +109,12 @@ int check_executable ( int fd, struct stat *buf )
     return ( 0 );
 }
 
-const char *showHexString( unsigned char *hex, size_t n )
+const char *show_hex_string ( unsigned char *hex, size_t n )
 {
     char buff2 [ n + 1 ];
     for ( size_t i = 0; i < n; i++ )
     {
-	snprintf ( buff2, n, "%02x", hex[i]);
+	snprintf ( buff2, n, "%02x", hex [ i ] );
 	strncpy ( buff, buff2, PATH_MAX );
     }
     return buff;
@@ -125,9 +122,9 @@ const char *showHexString( unsigned char *hex, size_t n )
 
 const char *calc_hash ( const char *path )
 {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256( (unsigned char *)path, strlen(path), hash );
-    showHexString( hash, SHA256_DIGEST_LENGTH );
+    unsigned char hash [ SHA256_DIGEST_LENGTH ];
+    SHA256 ( ( unsigned char * ) path, strlen ( path ), hash );
+    show_hex_string( hash, SHA256_DIGEST_LENGTH );
 
     return buff;
 }

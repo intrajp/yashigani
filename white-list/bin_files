@@ -4726,11 +4726,49 @@
 /usr/sbin/zramctl
 /usr/sbin/zstreamdump
 /usr/sbin/ztest
-/etc/ld.so.cache
-/usr/lib64/libc.so.6
-/usr/lib64/libcap.so.2
-/usr/lib64/libc-2.27.so
-/usr/lib64/libselinux.so.1
-/usr/lib64/libacl.so.1.1.2253
-/usr/lib64/libpcre2-8.so.0.7.1
-/usr/lib64/libpthread-2.27.so
+
+## /usr/bin/cat
+#/usr/lib64/libacl.so.1.1.2253
+#/usr/lib64/libc-2.28.so
+#/usr/lib64/libpcre2-8.so.0.7.1
+#/usr/lib64/libpthread-2.28.so
+
+## /usr/bin/ls
+#/usr/lib64/libacl.so.1.1.2253
+#/usr/lib64/libc-2.28.so
+#/usr/lib64/libpcre2-8.so.0.7.1
+#/usr/lib64/libselinux.so.1
+
+## /usr/sbin/ztest
+#/etc/ld.so.cache
+#/usr/lib64/libacl.so.1.1.2253
+#/usr/lib64/libc-2.28.so
+#/usr/lib64/libtinfo.so.6.1
+#/usr/lib64/libpcre2-8.so.0.7.1
+#/usr/lib64/libpthread-2.28.so
+
+## /bin/sed
+#/etc/ld.so.cache
+#/usr/lib64/libacl.so.1.1.2253
+#/usr/lib64/libc-2.28.so
+#/usr/lib64/libpcre2-8.so.0.7.1
+#/usr/lib64/libpthread-2.28.so
+#/usr/lib64/libselinux.so.1
+
+## /usr/bin/lsof
+#/usr/lib64/libacl.so.1.1.2253
+#/usr/lib64/libc-2.28.so
+#/usr/lib64/libcrypto.so.1.1.1
+#/usr/lib64/libgssapi_krb5.so.2.2
+#/usr/lib64/libk5crypto.so.3.1
+#/usr/lib64/libpcre2-8.so.0.7.1
+#/usr/lib64/libpthread-2.28.so
+#/usr/lib64/libresolv-2.28.so
+#/usr/lib64/libselinux.so.1
+
+## /bin/ping
+#/etc/ld.so.cache
+#/usr/lib64/ld-2.28.so
+#/usr/lib64/libacl.so.1.1.2253
+#/usr/lib64/libcap.so.2.25
+#/usr/lib64/libcap.so.2.25

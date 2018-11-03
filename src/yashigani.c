@@ -23,7 +23,9 @@
 #include <limits.h>
 #include <string.h>
 #include "common.h"
-char path_name_ok [ PATH_MAX ];
+
+char path_bin [ PATH_MAX ];
+char path_lib [ PATH_MAX ];
 
 /* Read all available fanotify events from the file descriptor 'fd' */
 
@@ -39,9 +41,11 @@ void handle_events ( int fd )
     const char *path_echo = "";
     const char *sig_echo = "";
 
+    puts("\n---- handdle_events ----\n");
     /* Loop while events can be read from fanotify file descriptor */
     for( ; ; )
     {
+        //puts("---- for loop");
         /* Read some events */
         len = read ( fd, ( void * ) &buf, sizeof ( buf ) );
         if ( len == -1 && errno != EAGAIN )
@@ -70,41 +74,65 @@ void handle_events ( int fd )
 
             if ( metadata->fd >= 0 )
             {
-                ////////////////////////////////////////////
                 /* check fd is executable or not */
                 executable = check_executable ( metadata->fd , &info );
-		printf ("executable:%d\n",executable);
 		path_echo = get_path_name ( metadata->fd );
                 /* calculate hash of path */
                 sig_echo = calc_hash ( path_echo );
-
-                /* setting deny if fd is executable */
+                /* start checking white-list with the executables */
 		if ( executable )
                 {
-                    /* check with the white-list */
-                    if ( search_sig_and_path ( sig_echo, path_echo ) )
+                    /* check with the white-list ( bin path )*/
+                    if ( ( path_bin [ 0 ] == '\0' ) && ( search_sig_and_path ( sig_echo, path_echo, "./white-list/bin_files" ) ) )
 		    {
-                        printf("FAN_ALLOW\n");
-                        response.response = FAN_ALLOW; /* allow if path is in the list */
-                        strncpy ( path_name_ok , path_echo, PATH_MAX - 1 );
-                        printf("path_name_ok:%s\n",path_name_ok);
+                        printf("FAN_ALLOW-1\n");
+                        response.response = FAN_ALLOW;
+                        strncpy ( path_bin , path_echo, PATH_MAX - 1 );
+                        printf("path_bin:%s\n",path_bin);
 		    }
 		    else
 		    {
-                        printf("path_name_ok2:%s\n",path_name_ok);
-                        if ( ( strcmp ( path_name_ok, "" )  != 0 ) || ( search_sig_and_path ( sig_echo, path_name_ok ) ) )
+                        printf("path_bin:%s\n",path_bin);
+                        memset ( path_lib, '\0', PATH_MAX );
+
+                        /* check with the white-list ( library path )*/
+                        if ( strcmp ( path_bin, "/usr/bin/ls" ) == 0 ) 
                         {
-                            printf("FAN_ALLOW\n");
-                            response.response = FAN_ALLOW; /* allow if path is not in the list */
-                            printf("path_name_ok3:%s\n",path_name_ok);
-                            path_name_ok [ 0 ]= '\0';
+                            strncpy ( path_lib , path_echo, PATH_MAX - 1 );
+                            printf("check this path:%s\n",path_lib);
+                            if ( search_sig_and_path ( sig_echo, path_echo, "./white-list/library-files/usr_bin_ls" ) )
+                            {
+                                response.response = FAN_ALLOW;
+                                strncpy ( path_lib , path_echo, PATH_MAX - 1 );
+                                printf("Found:%s\n",path_echo);
+                            }
+                            else
+                            {
+                                printf("Not found:%s\n", path_echo);
+                                response.response = FAN_DENY;
+                            }
+		        }
+                        else if ( strcmp ( path_bin, "/usr/bin/sed" ) == 0 ) 
+                        {
+                            strncpy ( path_lib , path_echo, PATH_MAX - 1 );
+                            printf("check this path:%s\n",path_lib);
+                            if ( search_sig_and_path ( sig_echo, path_echo, "./white-list/library-files/usr_bin_sed" ) )
+                            {
+                                strncpy ( path_lib , path_echo, PATH_MAX - 1 );
+                                printf("Found:%s\n",path_echo);
+                                response.response = FAN_ALLOW;
+                            }
+                            else
+                            {
+                                printf("Not found:%s\n", path_echo);
+                                response.response = FAN_DENY;
+                            }
                         }
                         else
                         {
-                            printf("FAN_DENY\n");
-                            response.response = FAN_DENY; /* deny if path is in the list */
+                            response.response = FAN_DENY;
                         }
-		    }
+                    }
                 }
 		else
                     response.response = FAN_ALLOW; /* allow if not executable */
@@ -113,17 +141,14 @@ void handle_events ( int fd )
                 /* Handle open permission event */
                 if ( metadata->mask & FAN_OPEN_PERM )
                 {
-                    printf("FAN_OPEN_PERM: ");
                     /* Allow file to be opened */
                     response.fd = metadata->fd;
-                    //response.response = FAN_ALLOW;
                     write ( fd, &response,
                           sizeof ( struct fanotify_response ) );
                 }
                 /* Handle closing of writable file event */
                 if ( metadata->mask & FAN_CLOSE_WRITE )
                     printf("FAN_CLOSE_WRITE: ");
-                printf("File %s\n", path_echo);
                 close ( metadata->fd );
             }
             /* Advance to next event */

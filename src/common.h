@@ -82,7 +82,7 @@ const char *get_path_name ( int fd );
 /*
  * search_sig_and_path 
  *
- * This function searches signiture and path from file 
+ * This function searches signiture and path from file given
  *
  * if matches, return 1, if not return 0
  *
@@ -90,6 +90,10 @@ const char *get_path_name ( int fd );
  *
  * Calls
  */
-int search_sig_and_path ( const char *sig, const char *path );
+int search_sig_and_path ( const char *sig, const char *path, const char *searchfile );
 
-const char *showHexString( unsigned char *hex, size_t n );
+/*
+ * show_hex_string 
+ *
+ */
+const char *show_hex_string( unsigned char *hex, size_t n );
