@@ -30,6 +30,10 @@
 #include <sys/types.h> /* for check executable */
 #include <unistd.h>
 
+#define PROGRAM_VERSION 0 
+#define PROGRAM_RELEASE 3 
+#define PROGRAM_SUB_RELEASE 2
+
 /*
  * handle_events
  *
