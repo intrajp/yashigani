@@ -22,10 +22,16 @@
 
 //#define _GNU_SOURCE     /* Needed to get O_LARGEFILE definition */
 #include <poll.h>
+#include <string.h>
 #include "common.h" 
+
+extern char path_bin [ PATH_MAX ];
+extern char path_lib [ PATH_MAX ];
 
 int main ( int argc, char *argv [ ] )
 {
+    memset ( path_bin, '\0', PATH_MAX );
+    memset ( path_lib, '\0', PATH_MAX );
     char buf;
     int fd, poll_num;
     nfds_t nfds;
