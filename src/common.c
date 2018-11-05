@@ -147,21 +147,21 @@ int search_path_and_hash ( const char *path, const char *hash, const char *searc
         /* Failed to find */
         break_id = ( check_each_hash_and_path ( &line, path, hash ) );
         if ( break_id == 1 )
-	{
+        {
             puts ( "check_each_hash_and_path returned 1");
             ret = -1;
             break;
         }
         /* Matched */
         else if ( break_id == 0 )
-	{
+        {
             puts ( "check_each_hash_and_path returned 0");
             ret = 0;
             break;
         }
         /* !! security bleach !! */
         else if ( break_id == 2 )
-	{
+        {
             puts ( "check_each_hash_and_path returned 2");
             ret = 2;
             break;

@@ -81,11 +81,11 @@ void handle_events ( int fd )
                 /* check fd is executable or not */
                 executable = check_executable ( metadata->fd , &info );
                 /* get path from fd */
-		path_echo = get_path_name ( metadata->fd );
+                path_echo = get_path_name ( metadata->fd );
                 /* calculate hash of path */
                 hash_echo = calc_hash ( path_echo );
                 /* start checking white-list with the executables */
-		if ( executable )
+                if ( executable )
                 {
                     puts("executable");
                     /* check with the white-list ( bin path ) */
@@ -121,14 +121,14 @@ void handle_events ( int fd )
                             memset ( path_lib, '\0', PATH_MAX );
                         }
                         else if ( path_ok == 0 )
-		        {
+                        {
                             printf("search_path_and_hash says 'Path and hash matched. Moving on to the library search.'\n");
                             response.response = FAN_ALLOW;
                             strncpy ( path_bin , path_echo, PATH_MAX - 1 );
                             printf("path_bin:%s\n",path_bin);
                             /* initialize */
                             memset ( path_lib, '\0', PATH_MAX );
-		        }
+                        }
                         else
                         {
                             printf("Not found:%s\n", path_echo);
@@ -139,7 +139,7 @@ void handle_events ( int fd )
                         }
                     }
                     if ( path_ok == 0 )
-		    {
+                    {
                         printf("I've checked this path and hash, so I try to check library's path and hash.'\n\n");
                         printf("path_bin:%s\n",path_bin);
                         /* initialize */
@@ -179,7 +179,7 @@ void handle_events ( int fd )
                                 memset ( path_lib, '\0', PATH_MAX );
                             }
                             else if ( path_ok == 0 )
-		            {
+                            {
                                 printf("search_path_and_hash says 'Path and hash matched'\n");
                                 response.response = FAN_ALLOW;
                                 strncpy ( path_lib , path_echo, PATH_MAX - 1 );
@@ -187,13 +187,13 @@ void handle_events ( int fd )
                                 /* initialize */
                                 memset ( path_bin, '\0', PATH_MAX );
                                 memset ( path_lib, '\0', PATH_MAX );
-		            }
+                            }
                             else
                             {
                                 printf("Not found:%s\n", path_echo);
                                 response.response = FAN_DENY;
                             }
-		        }
+                        }
                         else if ( path_ok == -1 )
                         {
                             printf("Failed to find path and hash:%s\n", path_echo);
@@ -204,7 +204,7 @@ void handle_events ( int fd )
                         }
                     }
                 }
-		else
+                else
                 {
                     /*puts("not executable");*/
                     /*printf("path_echo:%s\n",path_echo);*/

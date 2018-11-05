@@ -30,9 +30,6 @@
 #include <sys/types.h> /* for check executable */
 #include <unistd.h>
 
-//extern int inode;   
-//extern int inode_former;   
-
 /*
  * handle_events
  *
@@ -65,7 +62,6 @@ int  check_executable ( int fd, struct stat *buf );
  *
  * Calls
  */
-//int calc_hash ( const char *path );
 const char *calc_hash ( const char *path );
 
 /*
@@ -84,8 +80,6 @@ const char *get_path_name ( int fd );
  *
  * This function searches signiture and path from file given
  *
- * if matches, return 1, if not return 0
- *
  * Caller yashigani.c
  *
  * Calls
@@ -98,4 +92,8 @@ int search_path_and_hash ( const char *path, const char *hash, const char *searc
  */
 const char *show_hex_string( unsigned char *hex, size_t n );
 
+/*
+ * check_each_path_and_hash 
+ *
+ */
 int check_each_path_and_hash ( char **line, const char *path, const char *hash );
