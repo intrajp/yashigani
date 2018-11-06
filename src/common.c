@@ -45,26 +45,31 @@ int check_each_hash_and_path ( char **line, const char *path, const char *hash )
     if ( strcmp ( token, "EOF" ) == 0 )
     {
         break_id = 1;
-        printf("--break_id--:%d\n",break_id);
+        printf("path:%s\n",path);
+        /* printf("--break_id--:%d\n",break_id); */
         return ( break_id );
     }
     /* did not match, but try again */
     if ( strcmp ( token, path ) != 0 )
     {
-        printf("tokn:%s\n",token);
-        printf("path:%s\n",path);
-        puts("Not match !!");
+        /*
+	 * printf("tokn:%s\n",token);
+         * printf("path:%s\n",path);
+         * puts("Not match !!");
+	 */
         break_id = 3;
-        printf("--break_id--:%d\n",break_id);
+        /* printf("--break_id--:%d\n",break_id); */
         return ( break_id );
     }
     /* matched, so check next token ( hash ) */
-    else
-    {
-        printf("tokn:%s\n",token);
-        printf("path:%s\n",path);
-        puts("path Match !!");
-    }
+    /*
+     * else
+     * {
+     *  printf("tokn:%s\n",token);
+     *  printf("path:%s\n",path);
+     *  puts("path Match !!");
+     * }
+    */
 
     /* walk throuth other tokens */
     while ( token != NULL )
@@ -73,20 +78,26 @@ int check_each_hash_and_path ( char **line, const char *path, const char *hash )
         token = strtok ( NULL, s );
         if ( token == NULL )
             break;
-        puts("--Next token--");
-        printf("tokn:%s\n",token);
+        /* puts("--Next token--");
+         * printf("tokn:%s\n",token);
+	 */
         /* reached EOF, so return 1 */
         if ( strcmp ( token, "EOF" ) == 0 )
         {
+            printf("path:%s\n",path);
+            printf("hash:%s\n",hash);
             break_id  = 1;
+            token = NULL;
             break;
         }
         /* Both path and hash matched, so return ( 0 ) */
         else if ( strcmp ( token, hash ) == 0 )
         {
-            printf("tokn:%s\n",token);
-            printf("hash:%s\n",hash);
-            puts("hash ( and path ) Match !!");
+            /*
+	     * printf("tokn:%s\n",token);
+             * printf("hash:%s\n",hash);
+             * puts("hash ( and path ) Match !!");
+	     */
             break_id  = 0;
             token = NULL;
             break;
@@ -98,10 +109,11 @@ int check_each_hash_and_path ( char **line, const char *path, const char *hash )
             printf("hash:%s\n",hash);
             puts("Not match !!");
             break_id  = 2;
+            token = NULL;
             break;
-        }
+        } 
     }
-    printf("--break_id--:%d\n",break_id);
+    /* printf("--break_id--:%d\n",break_id); */
     return ( break_id );
 }
 
@@ -117,7 +129,7 @@ int search_path_and_hash ( const char *path, const char *hash, const char *searc
     int ret = -1;
 
     /* open file */
-    if ( ( fp=fopen ( searchfile, "r" ) ) == NULL )
+    if ( ( fp = fopen ( searchfile, "r" ) ) == NULL )
     {
         printf("can't open file (%s): %s\n",searchfile,strerror(errno));
         exit ( EXIT_FAILURE );
@@ -141,28 +153,28 @@ int search_path_and_hash ( const char *path, const char *hash, const char *searc
         /* this for compare rightly */
         line [ i - 1 ] = '\0';
         /* for debug */
-        printf("line:%s\n",line);
-        printf("path:%s\n",path);
-        printf("hash:%s\n",hash);
+        /* printf("line:%s\n",line); */
+        /* printf("path:%s\n",path); */
+        /* printf("hash:%s\n",hash); */
         /* Failed to find */
         break_id = ( check_each_hash_and_path ( &line, path, hash ) );
         if ( break_id == 1 )
         {
-            puts ( "check_each_hash_and_path returned 1");
+            /* puts ( "check_each_hash_and_path returned 1"); */
             ret = -1;
             break;
         }
         /* Matched */
         else if ( break_id == 0 )
         {
-            puts ( "check_each_hash_and_path returned 0");
+            /* puts ( "check_each_hash_and_path returned 0"); */
             ret = 0;
             break;
         }
         /* !! security bleach !! */
         else if ( break_id == 2 )
         {
-            puts ( "check_each_hash_and_path returned 2");
+            /* puts ( "check_each_hash_and_path returned 2"); */
             ret = 2;
             break;
         }

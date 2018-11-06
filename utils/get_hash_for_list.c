@@ -28,8 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void showHexString( unsigned char *hex, size_t n )
+void showHexString( const char *path, unsigned char *hex, size_t n )
 {
+    printf ( "%s  ",path );
     for ( size_t i = 0; i < n; i++ )
     {
         printf("%02x", hex[i] );
@@ -41,26 +42,16 @@ int calc_hash ( char *path )
 {
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256( (unsigned char *)path, strlen(path), hash );
-    showHexString( hash, SHA256_DIGEST_LENGTH );
+    showHexString( path, hash, SHA256_DIGEST_LENGTH );
 
     return ( 0 );
 }
 
 int main ( int argc, char *argv[] )
 {
-    calc_hash ("/usr/bin/df");
-/*
-    calc_hash ("/usr/lib64/ld-2.28.so");
-    calc_hash ("/usr/lib64/libselinux.so.1");
-    calc_hash ("/usr/lib64/libcap.so.2.25");
-    calc_hash ("/usr/lib64/libc-2.28.so");
-    calc_hash ("/usr/lib64/libpcre2-8.so.0.7.1");
-    calc_hash ("/usr/lib64/libdl-2.28.so");
-    calc_hash ("/usr/lib64/libpthread-2.28.so");
-    calc_hash ("/usr/bin/sed");
-    calc_hash ("/usr/lib64/libacl.so.1.1.2253");
-    calc_hash ("/usr/lib64/libattr.so.1.1.2448");
-*/
-    
+
+    calc_hash ("/usr/lib64/BugpointPasses.so");
+
     return ( 0 );
 }
+
