@@ -91,12 +91,14 @@ void handle_events ( int fd )
                     /* check with the white-list ( bin path ) */
                     strncpy ( path_bin , path_echo, PATH_MAX - 1 );
                     /* printf("----path_bin:%s\n",path_bin); */
-                    if ( ( path_bin [ 0 ] == '/' ) && ( strstr ( path_bin, "/usr/lib") == NULL ) )
+                    /* check executables, omitting /usr/lib, /usr/share, /usr/local */
+                    if ( ( path_bin [ 0 ] == '/' ) && ( strstr ( path_bin, "/usr/lib") == NULL ) &&
+                    ( strstr ( path_bin, "/usr/share") == NULL ) && ( strstr ( path_bin, "/usr/local" ) == NULL ) )
                     {
                         /* printf("I try to find the path and hash.'\n\n"); */
                         while ( 1 )
                         {
-                            path_ok = search_path_and_hash ( path_echo, hash_echo, "./white-list/bin-files/list_usr_bin" );
+                            path_ok = search_path_and_hash ( path_echo, hash_echo, "./white-list/bin-files/list_usr_bin_sbin" );
                             /* break if matched ( 0 ), come to an EOF ( -1 ) or hash did not match (security bleach) ( 2 ) */
                             if ( ( path_ok == 0 ) || ( path_ok == -1 ) || ( path_ok == 2 ) )
                                 break;
@@ -153,7 +155,7 @@ void handle_events ( int fd )
                             /* check with the white-list ( bin path ) */
                             while ( 1 )
                             {
-                                path_ok = search_path_and_hash ( path_echo, hash_echo, "./white-list/library-files/list_usr_lib64" );
+                                path_ok = search_path_and_hash ( path_echo, hash_echo, "./white-list/library-files/list_lib" );
                                 /* printf ("path_ok:%d\n",path_ok); */
                                 /* break if matched ( 0 ) or come to an EOF ( -1 ) */
                                 if ( ( path_ok == 0 ) || ( path_ok == -1 ) || ( path_ok == 2 ) )

@@ -32,7 +32,7 @@
 
 #define PROGRAM_VERSION 0 
 #define PROGRAM_RELEASE 3 
-#define PROGRAM_SUB_RELEASE 3
+#define PROGRAM_SUB_RELEASE 4
 
 /*
  * handle_events
