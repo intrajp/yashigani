@@ -21,6 +21,7 @@
  */
 
 //#define _GNU_SOURCE     /* Needed to get O_LARGEFILE definition */
+#include <ctype.h> /* for is_space */
 #include <poll.h>
 #include <string.h>
 #include "common.h" 
@@ -43,6 +44,10 @@ int main ( int argc, char *argv [ ] )
         fprintf(stderr, "Usage: %s MOUNT\n", argv[0]);
         exit ( EXIT_FAILURE );
     }
+
+    /* initialize yashigani stuff */
+    yashigani_init ( );
+
     printf("Press enter key to terminate.\n");
     /* Create the file descriptor for accessing the fanotify API */
 
@@ -51,6 +56,7 @@ int main ( int argc, char *argv [ ] )
     if ( fd == -1 )
     {
         perror ( "fanotify_init" );
+        free_yashigani_obj ( );
         exit ( EXIT_FAILURE );
     }
 
@@ -64,6 +70,7 @@ int main ( int argc, char *argv [ ] )
     {
         perror ( "fanotify_mark" );
         printf("debug - errno:%d\n",errno);
+        free_yashigani_obj ( );
         exit ( EXIT_FAILURE );
     }
     /* Prepare for polling */
@@ -76,7 +83,7 @@ int main ( int argc, char *argv [ ] )
     fds [ 1 ].events = POLLIN;
 
     /* This is the loop to wait for incoming events */
-    printf("Listening for events.\n");
+    /* printf("Listening for events.\n"); */
     while ( 1 )
     {
         poll_num = poll ( fds, nfds, -1 );
@@ -85,6 +92,7 @@ int main ( int argc, char *argv [ ] )
             if ( errno == EINTR )   /* Interrupted by a signal */
                 continue;           /* Restart poll() */
             perror ( "poll" );         /* Unexpected error */
+            free_yashigani_obj ( );
             exit ( EXIT_FAILURE );
         }
         if ( poll_num > 0 )
@@ -99,10 +107,12 @@ int main ( int argc, char *argv [ ] )
             if ( fds [ 1 ].revents & POLLIN )
 	    {
                 /* Fanotify events are available */
+                /*puts("handle_events ( fd ) "); */
                 handle_events( fd );
 	    }
         }
     }
     printf("Listening for events stopped.\n");
+    free_yashigani_obj ( );
     exit ( EXIT_SUCCESS );
 }

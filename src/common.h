@@ -25,14 +25,30 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/fanotify.h>
 #include <sys/stat.h> /* for check executable */
 #include <sys/types.h> /* for check executable */
 #include <unistd.h>
 
 #define PROGRAM_VERSION 0 
-#define PROGRAM_RELEASE 3 
-#define PROGRAM_SUB_RELEASE 4
+#define PROGRAM_RELEASE 4 
+#define PROGRAM_SUB_RELEASE 0
+
+FILE *fp;
+FILE *fp2;
+
+typedef struct line_data
+{
+    const char _line [ PATH_MAX ];
+    struct line_data *next;
+} node;
+
+/* pointer to the global data, it should be available
+ * once yashigani_init () was called.
+ */
+extern struct line_data *yashigani_bin_obj;
+extern struct line_data *yashigani_lib_obj;
 
 /*
  * handle_events
@@ -88,7 +104,8 @@ const char *get_path_name ( int fd );
  *
  * Calls
  */
-int search_path_and_hash ( const char *path, const char *hash, const char *searchfile );
+//int search_path_and_hash ( const char *path, const char *hash, const char *searchfile );
+int search_path_and_hash ( const char *path, const char *hash, node **obj );
 
 /*
  * show_hex_string 
@@ -101,3 +118,18 @@ const char *show_hex_string( unsigned char *hex, size_t n );
  *
  */
 int check_each_path_and_hash ( char **line, const char *path, const char *hash );
+
+int init_list ( node **obj );
+node *allocate_mem_to_one_node ( void );
+void set_list ( node *obj, char *line, node *obj_next );
+int insert_node_top_of_the_list ( node **obj, char *line );
+int append_list ( node **obj, char *line );
+int check_token ( int break_id, node *ptr_tmp, char *token, const char *path, const char *hash );
+int search_from_list ( node **obj, node **obj2, const char *path, const char *hash );
+void print_list ( node **obj );
+int delete_obj ( node **obj );
+int clear_list ( node **obj );
+
+void yashigani_init ( void );
+int create_yashigani_obj ( void );
+int free_yashigani_obj ( void );

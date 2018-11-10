@@ -27,6 +27,10 @@
 char path_bin [ PATH_MAX ];
 char path_lib [ PATH_MAX ];
 
+/* meaning reached EOF */
+int path_ok = -1;
+int lib_ok = -1;
+
 /* Read all available fanotify events from the file descriptor 'fd' */
 
 void handle_events ( int fd )
@@ -40,8 +44,6 @@ void handle_events ( int fd )
     executable = 0; /* setting no executable */
     const char *path_echo = "";
     const char *hash_echo = "";
-    /* meaning reached EOF */
-    int path_ok = -1;
 
     /* puts("\n---- handdle_events ----\n"); */
     /* Loop while events can be read from fanotify file descriptor */
@@ -72,12 +74,13 @@ void handle_events ( int fd )
                 exit(EXIT_FAILURE);
             }
             /* metadata->fd contains either FAN_NOFD, indicating a
-               queue overflow, or a file descriptor (a nonnegative
-               integer). Here, we simply ignore queue overflow. */
-
+             * queue overflow, or a file descriptor (a nonnegative
+             * integer). Here, we simply ignore queue overflow.
+	     */
             if ( metadata->fd >= 0 )
             {
                 /* printf("metadata->fd:%d\n",metadata->fd); */
+                /* printf("path_ok:%d\n",path_ok); */
                 /* check fd is executable or not */
                 executable = check_executable ( metadata->fd , &info );
                 /* get path from fd */
@@ -87,22 +90,29 @@ void handle_events ( int fd )
                 /* start checking white-list with the executables */
                 if ( executable )
                 {
-                    /* puts("executable"); */
-                    /* check with the white-list ( bin path ) */
-                    strncpy ( path_bin , path_echo, PATH_MAX - 1 );
-                    /* printf("----path_bin:%s\n",path_bin); */
+                    /* puts("---- executable"); */
+                    if ( ( path_echo [ 0 ] == '/' ) && ( strstr ( path_echo, "/usr/lib") == NULL ) &&
+                    ( strstr ( path_echo, "/usr/share") == NULL ) && ( strstr ( path_echo, "/usr/local" ) == NULL ) )
+                    {
+                        /* check with the white-list ( bin path ) */
+                        strncpy ( path_bin , path_echo, PATH_MAX - 1 );
+                        /* printf("----path_bin:%s\n",path_bin); */
+                    }
+                    if ( ( path_echo [ 0 ] == '/' ) && ( strstr ( path_echo, "/usr/lib") != NULL ) )
+                    {
+                        /* check with the white-list ( lib path ) */
+                        strncpy ( path_lib , path_echo, PATH_MAX - 1 );
+                        /* printf("----path_lib:%s\n",path_lib); */
+                    }
                     /* check executables, omitting /usr/lib, /usr/share, /usr/local */
-                    if ( ( path_bin [ 0 ] == '/' ) && ( strstr ( path_bin, "/usr/lib") == NULL ) &&
+                    if ( ( path_bin [ 0 ] == '/' ) && ( path_lib [ 0 ] == '\0' ) && ( strstr ( path_bin, "/usr/lib") == NULL ) &&
                     ( strstr ( path_bin, "/usr/share") == NULL ) && ( strstr ( path_bin, "/usr/local" ) == NULL ) )
                     {
+                        /* printf("----path_bin:%s\n",path_bin); */
                         /* printf("I try to find the path and hash.'\n\n"); */
-                        while ( 1 )
-                        {
-                            path_ok = search_path_and_hash ( path_echo, hash_echo, "./white-list/bin-files/list_usr_bin_sbin" );
-                            /* break if matched ( 0 ), come to an EOF ( -1 ) or hash did not match (security bleach) ( 2 ) */
-                            if ( ( path_ok == 0 ) || ( path_ok == -1 ) || ( path_ok == 2 ) )
-                                break;
-                        }
+                        path_ok = search_path_and_hash ( path_echo, hash_echo, &yashigani_bin_obj );
+			/* printf("path_ok:%d\n",path_ok); */
+			/* printf("I am yashigani.c and I caught path_ok:%d\n",path_ok); */
                         if ( path_ok == -1 )
                         {
                             response.response = FAN_DENY;
@@ -140,28 +150,22 @@ void handle_events ( int fd )
                             memset ( path_lib, '\0', PATH_MAX );
                         }
                     }
-                    if ( path_ok == 0 )
+                    else if ( ( path_echo [ 0 ] == '/' ) && ( strstr ( path_echo, "/usr/lib") != NULL ) )
                     {
-                        /* printf("I've checked this path and hash, so I try to check library's path and hash.'\n\n"); */
+                        /* printf("I've checked this path and hash, so I try to check library's path and hash.'\n"); */
                         /* printf("path_bin:%s\n",path_bin); */
                         /* initialize */
                         memset ( path_lib, '\0', PATH_MAX );
-
-                        /* check with the white-list ( library path ) */
-                        if ( strstr ( path_bin, "/usr/bin/" ) != 0 ) 
+                        /* check with the white-list ( library path ) and path is /usr/bin, /usr/sbin */
+                        if ( ( strstr ( path_bin, "/usr/bin/" ) != 0 ) || ( strstr ( path_bin, "/usr/bin/" ) != 0 ) )
                         {
                             strncpy ( path_lib , path_echo, PATH_MAX - 1 );
                             /* printf("check this path:%s\n",path_lib); */
                             /* check with the white-list ( bin path ) */
-                            while ( 1 )
-                            {
-                                path_ok = search_path_and_hash ( path_echo, hash_echo, "./white-list/library-files/list_lib" );
-                                /* printf ("path_ok:%d\n",path_ok); */
-                                /* break if matched ( 0 ) or come to an EOF ( -1 ) */
-                                if ( ( path_ok == 0 ) || ( path_ok == -1 ) || ( path_ok == 2 ) )
-                                    break;
-                            }
-                            if ( path_ok == -1 )
+                            lib_ok = search_path_and_hash ( path_echo, hash_echo, &yashigani_lib_obj );
+                            /* printf ("path_ok:%d\n",path_ok); */
+                            /* break if matched ( 0 ) or come to an EOF ( -1 ) */
+                            if ( lib_ok == -1 )
                             {
                                 response.response = FAN_DENY;
                                 strncpy ( path_lib , path_echo, PATH_MAX - 1 );
@@ -170,7 +174,7 @@ void handle_events ( int fd )
                                 memset ( path_bin, '\0', PATH_MAX );
                                 memset ( path_lib, '\0', PATH_MAX );
                             }
-                            else if ( path_ok == 2 )
+                            else if ( lib_ok == 2 )
                             {
                                 printf("Path matched but %s hash did not match.\n\
                                 This could be a security bleach, I deny to open this file.'\n",path_lib);
@@ -180,7 +184,7 @@ void handle_events ( int fd )
                                 memset ( path_bin, '\0', PATH_MAX );
                                 memset ( path_lib, '\0', PATH_MAX );
                             }
-                            else if ( path_ok == 0 )
+                            else if ( lib_ok == 0 )
                             {
                                 /* printf("search_path_and_hash says 'Path and hash matched'\n"); */
                                 response.response = FAN_ALLOW;
@@ -196,7 +200,7 @@ void handle_events ( int fd )
                                 response.response = FAN_DENY;
                             }
                         }
-                        else if ( path_ok == -1 )
+                        else if ( lib_ok == -1 )
                         {
                             printf("Failed to find path and hash:%s\n", path_echo);
                             response.response = FAN_DENY;
@@ -205,6 +209,12 @@ void handle_events ( int fd )
                             memset ( path_lib, '\0', PATH_MAX );
                         }
                     }
+                    else
+                    {
+                        printf("Unknown library. Deny to open this one.");
+                        printf("path_lib:%s\n",path_lib);
+                        response.response = FAN_DENY;
+                    }
                 }
                 else
                 {
@@ -212,7 +222,6 @@ void handle_events ( int fd )
                     /* printf("path_echo:%s\n",path_echo); */
                     response.response = FAN_ALLOW; /* allow if not executable */
                 }
-
                 /* Handle open permission event */
                 if ( metadata->mask & FAN_OPEN_PERM )
                 {
@@ -226,10 +235,8 @@ void handle_events ( int fd )
                     printf("FAN_CLOSE_WRITE: ");
                 close ( metadata->fd );
             }
-            /* initialize */
-            memset ( path_bin, '\0', PATH_MAX );
-            memset ( path_lib, '\0', PATH_MAX );
             /* Advance to next event */
+	    /* puts("Next event...\n"); */
             metadata = FAN_EVENT_NEXT ( metadata, len );
         }
     }

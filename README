@@ -1,1 +1,9 @@
 # yashigani is PoC of fanotify 
+
+How to use:
+
+# yashigani /
+
+1. Seeing DENY action
+
+Type 'ls' from other console.
