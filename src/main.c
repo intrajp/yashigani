@@ -22,15 +22,32 @@
 
 //#define _GNU_SOURCE     /* Needed to get O_LARGEFILE definition */
 #include <ctype.h> /* for is_space */
+#include <getopt.h>
 #include <poll.h>
 #include <string.h>
 #include "common.h" 
+#include "main.h" 
 
 extern char path_bin [ PATH_MAX ];
 extern char path_lib [ PATH_MAX ];
 
+/* brief Print help for this application */
+
+void print_help ( void )
+{
+    printf("\n Usage: %s [OPTIONS]\n\n", app_name);
+    printf("  Options:\n");
+    printf("   -R --reload-list          Reload from white-list files\n");
+    printf("   -p --print-list           print present white-list on memory\n");
+    printf("   -h --help                 Print this help\n");
+    printf("\n");
+}
+
 int main ( int argc, char *argv [ ] )
 {
+    int value, option_index;
+    int RELOAD = 0;
+    int PRINT = 0;
     memset ( path_bin, '\0', PATH_MAX );
     memset ( path_lib, '\0', PATH_MAX );
     char buf;
@@ -38,15 +55,56 @@ int main ( int argc, char *argv [ ] )
     nfds_t nfds;
     struct pollfd fds [ 2 ];
 
+    static struct option long_options [ ] = {
+        { "reload-list", no_argument,     0, 'r' },
+        { "print-list", no_argument,     0, 'r' },
+        { "help",      no_argument,       0, 'h' },
+        { NULL,        0,                 0,  0  }
+    };
+
+    /* Try to process all command line arguments */
+    while ( ( value = getopt_long(argc, argv, "Rp", long_options, &option_index ) ) != - 1 ) {
+        switch ( value ) {
+            case 'R':
+		RELOAD = 1;
+                break;
+            case 'p':
+		PRINT = 1;
+                break;
+            case 'h':
+                print_help ( );
+                return EXIT_SUCCESS;
+                case '?':
+                print_help ( );
+                return EXIT_FAILURE;
+            default:
+                break;
+        }
+    }
+    if ( RELOAD == 1 )
+    {
+        yashigani_init ( 99 );
+        puts ( "\n\nData had been restored from files." );
+        exit ( EXIT_SUCCESS );
+    }
+
+    /* initialize yashigani stuff */
+    yashigani_init ( 1 );
+
+    if ( PRINT == 1 )
+    {
+        puts ( "\nPrint out present white-list on memory." );
+        print_list ( &yashigani_bin_obj );
+        puts ( "--------" );
+        print_list ( &yashigani_lib_obj );
+        exit ( EXIT_SUCCESS );
+    }
     /* Check mount point is supplied */
     if ( argc != 2 )
     {
         fprintf(stderr, "Usage: %s MOUNT\n", argv[0]);
         exit ( EXIT_FAILURE );
     }
-
-    /* initialize yashigani stuff */
-    yashigani_init ( );
 
     printf("Press enter key to terminate.\n");
     /* Create the file descriptor for accessing the fanotify API */

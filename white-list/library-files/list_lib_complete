@@ -2577,6 +2577,8 @@
 /usr/sbin/zstreamdump  3850494692d6901b92e29369fb08e5337d8c9c98565bb6561b5d4d8ef287c808
 /usr/sbin/ztest  ea1c0049f7e2c7187c7d8fbb569b104cded2f4b04cfe57cd7c5f86b0a851dca3
 /usr/sbin/zvbid  76c7058d961cd8dc308667c66d929a22552b2205b0c07d4970eb5ec736260ff0
+#/usr/local/bin
+/usr/local/bin/yashigani xxx
 # lib file
 /usr/share/skypeforlinux/libffmpeg.so  5401f3b35707eaf009057e48448aed0c2bf2fa66e4f2d2f7d7c28d174f2173e3
 /usr/share/skypeforlinux/libnode.so  7b2d8da68bfd931dc2b10142d7004229362a4c05a989e5e99857c80704a27e95

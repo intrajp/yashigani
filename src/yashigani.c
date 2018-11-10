@@ -1,5 +1,5 @@
 /*
- *  yashigani.c - function
+ *  yashigani.c - central function
  *  This file contains the contents of yashigani.
  *
  *  Copyright (C) 2018 Shintaro Fujiwara
@@ -91,24 +91,27 @@ void handle_events ( int fd )
                 if ( executable )
                 {
                     /* puts("---- executable"); */
-                    if ( ( path_echo [ 0 ] == '/' ) && ( strstr ( path_echo, "/usr/lib") == NULL ) &&
-                    ( strstr ( path_echo, "/usr/share") == NULL ) && ( strstr ( path_echo, "/usr/local" ) == NULL ) )
+                    /* check executables, in /usr/bin, /usr/sbin, /usr/local/bin */
+                    if ( ( path_echo [ 0 ] == '/' ) && ( ( strstr ( path_echo, "/usr/bin/") != NULL ) || 
+                    ( strstr ( path_echo, "/usr/sbin/") != NULL ) || ( strstr ( path_echo, "/usr/local/bin") != NULL ) ) )
                     {
                         /* check with the white-list ( bin path ) */
                         strncpy ( path_bin , path_echo, PATH_MAX - 1 );
                         /* printf("----path_bin:%s\n",path_bin); */
                     }
+                    /* check executables, in /usr/lib */
                     if ( ( path_echo [ 0 ] == '/' ) && ( strstr ( path_echo, "/usr/lib") != NULL ) )
                     {
                         /* check with the white-list ( lib path ) */
                         strncpy ( path_lib , path_echo, PATH_MAX - 1 );
                         /* printf("----path_lib:%s\n",path_lib); */
                     }
-                    /* check executables, omitting /usr/lib, /usr/share, /usr/local */
-                    if ( ( path_bin [ 0 ] == '/' ) && ( path_lib [ 0 ] == '\0' ) && ( strstr ( path_bin, "/usr/lib") == NULL ) &&
-                    ( strstr ( path_bin, "/usr/share") == NULL ) && ( strstr ( path_bin, "/usr/local" ) == NULL ) )
+
+                    /* check executables, in /usr/bin, /usr/sbin, /usr/local/bin */
+                    if ( ( path_echo [ 0 ] == '/' ) && ( ( strstr ( path_echo, "/usr/bin/") != NULL ) || 
+                    ( strstr ( path_echo, "/usr/sbin/") != NULL ) || ( strstr ( path_echo, "/usr/local/bin") != NULL ) ) )
                     {
-                        /* printf("----path_bin:%s\n",path_bin); */
+                        printf("----path_bin:%s\n",path_bin);
                         /* printf("I try to find the path and hash.'\n\n"); */
                         path_ok = search_path_and_hash ( path_echo, hash_echo, &yashigani_bin_obj );
 			/* printf("path_ok:%d\n",path_ok); */
@@ -150,6 +153,7 @@ void handle_events ( int fd )
                             memset ( path_lib, '\0', PATH_MAX );
                         }
                     }
+                    /* check executables, in /usr/lib */
                     else if ( ( path_echo [ 0 ] == '/' ) && ( strstr ( path_echo, "/usr/lib") != NULL ) )
                     {
                         /* printf("I've checked this path and hash, so I try to check library's path and hash.'\n"); */
@@ -157,7 +161,8 @@ void handle_events ( int fd )
                         /* initialize */
                         memset ( path_lib, '\0', PATH_MAX );
                         /* check with the white-list ( library path ) and path is /usr/bin, /usr/sbin */
-                        if ( ( strstr ( path_bin, "/usr/bin/" ) != 0 ) || ( strstr ( path_bin, "/usr/bin/" ) != 0 ) )
+                        if ( ( strstr ( path_bin, "/usr/bin/" ) != NULL ) || ( strstr ( path_bin, "/usr/bin/" ) != NULL ) ||
+                           ( strstr ( path_bin, "/usr/local/bin/" ) != NULL ) )
                         {
                             strncpy ( path_lib , path_echo, PATH_MAX - 1 );
                             /* printf("check this path:%s\n",path_lib); */
@@ -202,7 +207,7 @@ void handle_events ( int fd )
                         }
                         else if ( lib_ok == -1 )
                         {
-                            printf("Failed to find path and hash:%s\n", path_echo);
+                            printf("Failed to find path in /usr/bin, /usr/sbin, /usr/local/bin:%s\n", path_echo);
                             response.response = FAN_DENY;
                             /* initialize */
                             memset ( path_bin, '\0', PATH_MAX );

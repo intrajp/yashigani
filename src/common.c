@@ -22,146 +22,16 @@
 
 #include <ctype.h> /* for is_space */
 #include <errno.h>
-#include <string.h>
 #include <limits.h>
 #include <time.h> 
-#include <unistd.h> 
 #include <openssl/sha.h>
 #include <openssl/rand.h>
+#include <string.h>
+#include <unistd.h> 
 #include "common.h"
 
 char procfd_path_echo [ PATH_MAX ];
 char buff [ PATH_MAX ];
-
-/* line_obj_raw */
-struct line_data line_obj_raw =
-    {
-        "yashigani object", /* each line */
-        NULL /* next pointer */
-    };
-
-/* initialise */
-struct line_data *yashigani_bin_obj = &line_obj_raw;
-struct line_data *yashigani_lib_obj = &line_obj_raw;
-
-int create_yashigani_obj ( void )
-{
-    /* allocate the memory */
-    yashigani_bin_obj = ( struct line_data * ) malloc ( sizeof ( struct line_data ) );
-    yashigani_lib_obj = ( struct line_data * ) malloc ( sizeof ( struct line_data ) );
-
-    if ( ( yashigani_bin_obj == NULL ) || ( yashigani_lib_obj == NULL ) )
-    {
-        printf("malloc() failed to allocate memory\n");
-        exit ( EXIT_FAILURE );
-    }
-
-    return ( 0 );
-}
-
-int free_yashigani_obj ( void )
-{
-    /* free list */
-    free ( yashigani_bin_obj );
-    yashigani_bin_obj = NULL;
-
-    free ( yashigani_lib_obj );
-    yashigani_lib_obj = NULL;
-
-    /* clear list */
-    clear_list ( &yashigani_bin_obj );
-    yashigani_bin_obj = NULL;
-
-    clear_list ( &yashigani_lib_obj );
-    yashigani_lib_obj = NULL;
-
-    return ( 0 );
-}
-
-void yashigani_init ( void )
-{
-    const char *searchfile = "./white-list/bin-files/list_usr_bin_sbin";
-    const char *searchfile2 = "./white-list/library-files/list_lib";
-    char *line = "";
-    char linebuf [ PATH_MAX ];
-    int lnr = 0;
-    int i;
-
-    /* opening file and get file pointers */
-    if ( ( fp = fopen ( searchfile, "r" ) ) == NULL )
-    {
-        printf("can't open file (%s): %s\n",searchfile,strerror(errno));
-        exit ( EXIT_FAILURE );
-    }
-    else
-        printf("Opened file (%s)\n",searchfile);
-
-    /* opening file and get file pointers */
-    if ( ( fp2 = fopen ( searchfile2, "r" ) ) == NULL )
-    {
-        printf("can't open file (%s): %s\n",searchfile2,strerror(errno));
-        exit ( EXIT_FAILURE );
-    }
-    else
-        printf("Opened file (%s)\n",searchfile2);
-
-    /* now, creating object */
-    create_yashigani_obj ( );
-
-    /* read file and parse lines */
-    while ( fgets ( linebuf, sizeof ( linebuf ), fp ) != NULL )
-    {
-        lnr++;
-        line = linebuf;
-        i = ( int ) strlen ( line );
-        /* ignore comment lines */
-        if ( ( line [ 0 ] == '#' ) || ( line [ 0 ] == ' ') )
-            continue;
-        /* strip newline */
-        if ( ( i <= 0 ) || ( line [ i - 1 ] != '\n' ) )
-        {
-            printf("%s:%d: line too long or last line missing newline\n",searchfile,lnr);
-	    free_yashigani_obj ( );
-            exit ( EXIT_FAILURE );
-        }
-        /* this for compare rightly */
-        line [ i - 1 ] = '\0';
-        /* strip trailing spaces */
-        for ( i--; ( i > 0 ) && isspace ( line [ i -1 ] ) ; i-- )
-            line [ i -1 ] = '\0';
-	printf ("%s",line);
-	append_list ( &yashigani_bin_obj, line );
-    }
-    /* after reading all lines, close the file pointer */
-    fclose ( fp );
-
-    /* read file and parse lines */
-    while ( fgets ( linebuf, sizeof ( linebuf ), fp2 ) != NULL )
-    {
-        lnr++;
-        line = linebuf;
-        i = ( int ) strlen ( line );
-        /* ignore comment lines */
-        if ( ( line [ 0 ] == '#' ) || ( line [ 0 ] == ' ') )
-            continue;
-        /* strip newline */
-        if ( ( i <= 0 ) || ( line [ i - 1 ] != '\n' ) )
-        {
-            printf("%s:%d: line too long or last line missing newline\n",searchfile2,lnr);
-	    free_yashigani_obj ( );
-            exit ( EXIT_FAILURE );
-        }
-        /* this for compare rightly */
-        line [ i - 1 ] = '\0';
-        /* strip trailing spaces */
-        for ( i--; ( i > 0 ) && isspace ( line [ i -1 ] ) ; i-- )
-            line [ i -1 ] = '\0';
-	printf ("%s",line);
-	append_list ( &yashigani_lib_obj, line );
-    }
-    /* after reading all lines, close the file pointer */
-    fclose ( fp2 );
-}
 
 int check_executable ( int fd, struct stat *buf )
 {
@@ -173,7 +43,6 @@ int check_executable ( int fd, struct stat *buf )
     else
         if ( buf->st_mode & S_IXUSR )
 	    return ( 1 );
-
     return ( 0 );
 }
 
@@ -195,7 +64,6 @@ const char *calc_hash ( const char *path )
     unsigned char hash [ SHA256_DIGEST_LENGTH ];
     SHA256 ( ( unsigned char * ) path, strlen ( path ), hash );
     show_hex_string ( hash, SHA256_DIGEST_LENGTH );
-
     return buff;
 }
 
@@ -213,7 +81,6 @@ const char *get_path_name ( int fd )
         exit(EXIT_FAILURE);
     }
     procfd_path_echo [ path_len ] = '\0';
-
     return procfd_path_echo;
 }
 
@@ -223,7 +90,6 @@ int check_each_hash_and_path ( char **line, const char *path, const char *hash )
     const char s [ 4 ] = "  \t"; /* this is the delimiter */
     char *token = NULL;
     int break_id = 1;
-
     /* get the first token */
     token = strtok ( *line, s );
     /* printf("token:%s\n",token); */
@@ -255,7 +121,6 @@ int check_each_hash_and_path ( char **line, const char *path, const char *hash )
      *  puts("path Match !!");
      * }
     */
-
     if ( strcmp ( token, path ) == 0 )
     {
         /*puts("!! path matched !!"); */
@@ -308,17 +173,14 @@ int check_each_hash_and_path ( char **line, const char *path, const char *hash )
 int search_path_and_hash ( const char *path, const char *hash, node **obj )
 {
     node *ptr_tmp = *obj;
-
     char line_pre [ PATH_MAX ];
     char *line = "";
     memset ( line_pre, '\0', PATH_MAX );
     int break_id = -1;
     int ret = -1;
-
     /* first object has "",so skipping. */
     if ( strcmp ( ptr_tmp->_line , "" ) == 0 )
         ptr_tmp = ptr_tmp->next;
-
     while ( ptr_tmp != NULL )
     {
 	while ( ptr_tmp != NULL )
