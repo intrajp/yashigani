@@ -36,7 +36,7 @@
 
 #define PROGRAM_VERSION 0 
 #define PROGRAM_RELEASE 4 
-#define PROGRAM_SUB_RELEASE 0
+#define PROGRAM_SUB_RELEASE 1
 
 FILE *fp;
 FILE *fp2;
