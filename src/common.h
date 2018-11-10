@@ -20,6 +20,9 @@
  *  02110-1301 USA
  */
 
+#ifndef YASHIGANI__COMMON_H
+#define YASHIGANI__COMMON_H
+
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -104,7 +107,6 @@ const char *get_path_name ( int fd );
  *
  * Calls
  */
-//int search_path_and_hash ( const char *path, const char *hash, const char *searchfile );
 int search_path_and_hash ( const char *path, const char *hash, node **obj );
 
 /*
@@ -119,6 +121,30 @@ const char *show_hex_string( unsigned char *hex, size_t n );
  */
 int check_each_path_and_hash ( char **line, const char *path, const char *hash );
 
+
+/*
+ * load_data 
+ *
+ * This function loads data from white-list files to memory
+ *
+ * Caller common.c
+ *
+ * Calls none
+ */
+void load_data ( const char *file_name, node **obj );
+
+/*
+ * yashigani_init 
+ *
+ * This function creates object and load data from files.
+ * If 99 is given, restore from file to data.
+ *
+ * Caller init.c
+ *
+ * Calls none
+ */
+void yashigani_init ( int );
+
 int init_list ( node **obj );
 node *allocate_mem_to_one_node ( void );
 void set_list ( node *obj, char *line, node *obj_next );
@@ -130,6 +156,7 @@ void print_list ( node **obj );
 int delete_obj ( node **obj );
 int clear_list ( node **obj );
 
-void yashigani_init ( void );
 int create_yashigani_obj ( void );
 int free_yashigani_obj ( void );
+
+#endif /* YASHIGANI_COMMON_H */

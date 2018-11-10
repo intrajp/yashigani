@@ -2578,4 +2578,6 @@
 /usr/sbin/zstreamdump  3850494692d6901b92e29369fb08e5337d8c9c98565bb6561b5d4d8ef287c808
 /usr/sbin/ztest  ea1c0049f7e2c7187c7d8fbb569b104cded2f4b04cfe57cd7c5f86b0a851dca3
 /usr/sbin/zvbid  76c7058d961cd8dc308667c66d929a22552b2205b0c07d4970eb5ec736260ff0
+#/usr/local/bin
+/usr/local/bin/yashigani xxx
 EOF EOF

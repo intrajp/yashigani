@@ -2,6 +2,7 @@
 ## Ferora29
 # bin file
 /usr/bin/sed  2e9047d38e29b16d64f789fa9065c2a74a6c9d0b0509af574e15b3d07319ff24
-/usr/lib64/ld-2.28.so  xxxx
+/usr/local/bin/yashigani  ad343aaef08dbf77e8005337d18f07936dddac5a4dabdc9d82432a2895eff427 
 # lib file
+/usr/lib64/ld-2.28.so 9f22fdb5fd63b80ed8dfd5fa2a426a51e206719a770f4d742af2b1d0aa604f16 
 EOF  EOF

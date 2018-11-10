@@ -82,10 +82,12 @@ void print_list ( node **obj )
     {
 	if ( strcmp ( ptr_tmp->_line , "" ) == 0 )
         {
-            /* puts("Nothing in this line."); */
+            puts("Nothing in this line.");
             ptr_tmp = ptr_tmp->next;
             continue;
         }
+	else
+            printf("_line:%s\n",ptr_tmp->_line);
         ptr_tmp = ptr_tmp->next;
     }
 }
