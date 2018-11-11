@@ -15,12 +15,13 @@ else
     echo "autoconf is installed. I proceed."    
 fi
 
-GS=`which gs`
-if test -z $GS; then
-        echo "*** No gs found, please install the ghostscript package ***"
+OPENSSL_SHA="/usr/include/openssl/sha.h"
+OPENSSL_RAND="/usr/include/openssl/rand.h"
+if [ ! -f $OPENSSL_SHA ] || [ ! -f $OPENSSL_RAND ]; then
+        echo "*** No openssl header files found, please install the openssl-devel package ***"
         exit 1
 else
-    echo "gs is installed. I proceed."    
+    echo "openssl-devel is installed. I proceed."    
 fi
 
 INTLTOOLIZE=`which intltoolize`

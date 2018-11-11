@@ -1,5 +1,5 @@
 /*
- *  main.h - main definition 
+ *  cfg.h - configuration definition 
  *  This file contains the contents of yashigani.
  *
  *  Copyright (C) 2018 Shintaro Fujiwara
@@ -20,33 +20,33 @@
  *  02110-1301 USA
  */
 
-#ifndef YASHIGANI__MAIN_H
-#define YASHIGANI__MAIN_H
+#ifndef YASHIGANI__CFG_H
+#define YASHIGANI__CFG_H
 
-#include "common.h" 
+struct yashigani_config
+{
+    /* mount-point to be checked */
+    char mount_points [ 255 ];
+};
 
-static char *app_name = "yashigani";
-
-/*
- * usage 
- *
- * This function prints help 
- *
- * Caller main.c
- *
- * Calls
+/*  this is a pointer to the global configuration, it should be available
+ *  once cfg_init() was called
  */
-void usage ( void );
+extern struct yashigani_config *yashigani_cfg;
 
-/*
- * print_list 
- *
- * This function prints object ingredients 
- *
- * Caller
- *
- * Calls
+/*  Initialize the configuration in yashigani. This method
+ *  will read the default configuration file and call exit()
+ *  if an error occurs.
  */
-void print_list ( node **obj );
+void cfg_init ( const char *file_name );
 
-#endif /* YASHIGANI_MAIN_H */
+/* This function reads config file. */
+
+void cfg_read ( const char *file_name, struct yashigani_config *cfg );
+
+/*  This function frees the memory which had been allocated
+ *  for config file.
+ */
+void cfg_clear (  );
+
+#endif /* YASHIGANI__CFG_H */

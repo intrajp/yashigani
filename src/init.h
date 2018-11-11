@@ -1,5 +1,5 @@
 /*
- *  main.h - main definition 
+ *  init.h - init definition 
  *  This file contains the contents of yashigani.
  *
  *  Copyright (C) 2018 Shintaro Fujiwara
@@ -20,33 +20,16 @@
  *  02110-1301 USA
  */
 
-#ifndef YASHIGANI__MAIN_H
-#define YASHIGANI__MAIN_H
+#ifndef YASHIGANI__INIT_H
+#define YASHIGANI__INIT_H
 
-#include "common.h" 
+/* line_obj_raw */
+struct line_data line_obj_raw =
+    {
+        "yashigani object", /* each line */
+        NULL /* next pointer */
+    };
 
-static char *app_name = "yashigani";
+int clear_list ( node **obj );
 
-/*
- * usage 
- *
- * This function prints help 
- *
- * Caller main.c
- *
- * Calls
- */
-void usage ( void );
-
-/*
- * print_list 
- *
- * This function prints object ingredients 
- *
- * Caller
- *
- * Calls
- */
-void print_list ( node **obj );
-
-#endif /* YASHIGANI_MAIN_H */
+#endif /* YASHIGANI__INIT_H */

@@ -1,5 +1,5 @@
 /*
- *  main.h - main definition 
+ *  line_data.h - object definition 
  *  This file contains the contents of yashigani.
  *
  *  Copyright (C) 2018 Shintaro Fujiwara
@@ -20,33 +20,34 @@
  *  02110-1301 USA
  */
 
-#ifndef YASHIGANI__MAIN_H
-#define YASHIGANI__MAIN_H
+#ifndef YASHIGANI__LINE_DATA_H
+#define YASHIGANI__LINE_DATA_H
 
-#include "common.h" 
+#include <errno.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-static char *app_name = "yashigani";
+FILE *fp;
+FILE *fp2;
 
-/*
- * usage 
- *
- * This function prints help 
- *
- * Caller main.c
- *
- * Calls
+typedef struct line_data
+{
+    const char _line [ PATH_MAX ];
+    struct line_data *next;
+} node;
+
+/* pointer to the global data, it should be available
+ * once yashigani_init () was called.
  */
-void usage ( void );
+extern struct line_data *yashigani_bin_obj;
+extern struct line_data *yashigani_lib_obj;
 
-/*
- * print_list 
- *
- * This function prints object ingredients 
- *
- * Caller
- *
- * Calls
- */
-void print_list ( node **obj );
+node *allocate_mem_to_one_node ( void );
+int delete_obj ( node **obj );
+int init_list ( node **obj );
+int insert_node_top_of_the_list ( node **obj, char *line );
+void set_list ( node *obj, char *line, node *obj_next );
 
-#endif /* YASHIGANI_MAIN_H */
+#endif /* YASHIGANI_LINE_DATA_H */

@@ -21,20 +21,17 @@
  */
 
 #include "common.h"
+#include "init.h"
 
 char procfd_path_echo [ PATH_MAX ];
 char buff [ PATH_MAX ];
 
-/* line_obj_raw */
-struct line_data line_obj_raw =
-    {
-        "yashigani object", /* each line */
-        NULL /* next pointer */
-    };
-
 /* initialise each obj */
 struct line_data *yashigani_bin_obj = &line_obj_raw;
 struct line_data *yashigani_lib_obj = &line_obj_raw;
+
+const char *searchfile = "/usr/share/yashiganid/list_bin";
+const char *searchfile2 = "/usr/share/yashiganid/list_lib";
 
 int create_yashigani_obj ( void )
 {
@@ -66,8 +63,6 @@ int free_yashigani_obj ( void )
 
 void yashigani_init ( int x )
 {
-    const char *searchfile = "./white-list/bin-files/list_usr_bin_sbin";
-    const char *searchfile2 = "./white-list/library-files/list_lib";
     /* now, creating object if not data reload */
     if ( x != 99 )
         create_yashigani_obj ( );

@@ -28,7 +28,7 @@ version 2.1 of the License, or (at your option) any later version. See the
 configure.ac file for more details.])
 
 # initialize and set version and bugreport address
-AC_INIT([yashigani], [0.4.1], [shintaro.fujiwara@gmail.com])
+AC_INIT([yashigani], [0.4.2], [shintaro.fujiwara@gmail.com])
 RELEASE_MONTH="Nov 2018"
 AC_SUBST(RELEASE_MONTH)
 AC_CONFIG_MACRO_DIR([m4])
@@ -45,7 +45,7 @@ AC_CONFIG_SRCDIR([src/main.c])
 LOCALE_THIS=`locale | grep LANG | cut -d= -f2`
 
 # conditional behaivor
-AM_CONDITIONAL(LANG_JP, test `locale | grep LANG | cut -d= -f2` = "ja_JP.utf8")
+AM_CONDITIONAL(LANG_JP, test `locale | grep LANG | cut -d= -f2` = "ja_JP.UTF-8")
 
 # check for programs
 AC_PROG_CC
@@ -95,6 +95,7 @@ done
 # checks for availability of header files
 
 AC_CHECK_HEADERS([stdlib.h stdio.h string.h time.h dirent.h errno.h ctype.h math.h sys/stat.h fcntl.h limits.h getopt.h])
+AC_CHECK_HEADERS([openssl/sha.h openssl/rand.h])
 
 # other general checks
 AC_C_INLINE
@@ -110,6 +111,28 @@ AC_CHECK_FUNCS(__assert_fail)
 AC_SEARCH_LIBS(clock_gettime, rt)
 AC_CHECK_FUNCS([setusershell getusershell endusershell getgrouplist])
 AC_CHECK_DECLS([setusershell, getusershell, endusershell])
+
+# check the name of the configuration file
+AC_ARG_WITH(yashiganid-conf-file,
+            AS_HELP_STRING([--with-yashiganid-conf-file=PATH],
+                           [path to yashiganid configuration file @<:@/etc/yashiganid.conf@:>@]),
+            [ YASHIGANID_CONF_PATH="$with_yashiganid_conf_file" ],
+            [ YASHIGANID_CONF_PATH="/etc/yashiganid.conf" ])
+AC_DEFINE_UNQUOTED(YASHIGANID_CONF_PATH, "$YASHIGANID_CONF_PATH", [Path to yashiganid configuration file.])
+AC_SUBST(YASHIGANID_CONF_PATH)
+
+AC_ARG_WITH(yashiganid-data-file,
+            AS_HELP_STRING([--with-yashiganid-data-file=PATH],
+                           [path to yashiganid data file @<:@/usr/share/yashiganid/list_bin@:>@]),
+            [ YASHIGANID_DATA_PATH="$with_yashiganid_data_file" ],
+            #[ YASHIGANID_DATA_PATH="/usr/share/yashiganid" ])
+            [ YASHIGANID_DATA_PATH="/usr/share/yashiganid" ],
+            [ YASHIGANID_WHITE_LIST_BIN_PATH="/usr/share/yashiganid/list_bin" ],
+            [ YASHIGANID_WHITE_LIST_LIB_PATH="/usr/share/yashiganid/list_lib" ])
+AC_DEFINE_UNQUOTED(YASHIGANID_DATA_PATH, "$YASHIGANID_DATA_PATH", [Path to yashiganid data file.])
+AC_DEFINE_UNQUOTED(YASHIGANID_WHITE_LIST_BIN_PATH, "$YASHIGANID_WHITE_LIST_BIN_PATH", [Path to white-list list_bin file.])
+AC_DEFINE_UNQUOTED(YASHIGANID_WHITE_LIST_LIB_PATH, "$YASHIGANID_WHITE_LIST_LIB_PATH", [Path to white-list list_lib file.])
+AC_SUBST(YASHIGANID_DATA_PATH)
 
 AC_PROG_CC
 AC_CONFIG_FILES([

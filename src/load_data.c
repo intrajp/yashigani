@@ -21,7 +21,8 @@
  */
 
 #include <ctype.h> /* for is_space */
-#include "common.h"
+#include "line_data.h"
+#include "load_data.h"
 
 void load_data ( const char *file_name, node **obj )
 {

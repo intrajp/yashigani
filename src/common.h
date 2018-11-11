@@ -145,18 +145,10 @@ void load_data ( const char *file_name, node **obj );
  */
 void yashigani_init ( int );
 
-int init_list ( node **obj );
-node *allocate_mem_to_one_node ( void );
-void set_list ( node *obj, char *line, node *obj_next );
-int insert_node_top_of_the_list ( node **obj, char *line );
-int append_list ( node **obj, char *line );
 int check_token ( int break_id, node *ptr_tmp, char *token, const char *path, const char *hash );
-int search_from_list ( node **obj, node **obj2, const char *path, const char *hash );
-void print_list ( node **obj );
-int delete_obj ( node **obj );
-int clear_list ( node **obj );
-
 int create_yashigani_obj ( void );
 int free_yashigani_obj ( void );
+int init_list ( node **obj );
+int search_from_list ( node **obj, node **obj2, const char *path, const char *hash );
 
 #endif /* YASHIGANI_COMMON_H */

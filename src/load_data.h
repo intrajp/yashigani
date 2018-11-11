@@ -1,5 +1,5 @@
 /*
- *  main.h - main definition 
+ *  load_data.h - read file function's definition 
  *  This file contains the contents of yashigani.
  *
  *  Copyright (C) 2018 Shintaro Fujiwara
@@ -20,33 +20,19 @@
  *  02110-1301 USA
  */
 
-#ifndef YASHIGANI__MAIN_H
-#define YASHIGANI__MAIN_H
-
-#include "common.h" 
-
-static char *app_name = "yashigani";
+#ifndef YASHIGANI__LOAD_DATA_H
+#define YASHIGANI__LOAD_DATA_H
 
 /*
- * usage 
+ * append_list 
  *
- * This function prints help 
- *
- * Caller main.c
- *
- * Calls
  */
-void usage ( void );
+int append_list ( node **obj, char *line );
 
 /*
- * print_list 
+ * load_data
  *
- * This function prints object ingredients 
- *
- * Caller
- *
- * Calls
  */
-void print_list ( node **obj );
+void load_data ( const char *file_name, node **obj );
 
-#endif /* YASHIGANI_MAIN_H */
+#endif /* YASHIGANI_LOAD_DATA_H */

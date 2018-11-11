@@ -24,8 +24,6 @@
 #include <ctype.h> /* for is_space */
 #include <getopt.h>
 #include <poll.h>
-#include <string.h>
-#include "common.h" 
 #include "main.h" 
 
 extern char path_bin [ PATH_MAX ];
@@ -33,7 +31,7 @@ extern char path_lib [ PATH_MAX ];
 
 /* brief Print help for this application */
 
-void print_help ( void )
+void usage ( void )
 {
     printf("\n Usage: %s [OPTIONS]\n\n", app_name);
     printf("  Options:\n");
@@ -63,7 +61,7 @@ int main ( int argc, char *argv [ ] )
     };
 
     /* Try to process all command line arguments */
-    while ( ( value = getopt_long(argc, argv, "Rp", long_options, &option_index ) ) != - 1 ) {
+    while ( ( value = getopt_long(argc, argv, "Rph", long_options, &option_index ) ) != - 1 ) {
         switch ( value ) {
             case 'R':
 		RELOAD = 1;
@@ -72,10 +70,10 @@ int main ( int argc, char *argv [ ] )
 		PRINT = 1;
                 break;
             case 'h':
-                print_help ( );
+                usage ( );
                 return EXIT_SUCCESS;
                 case '?':
-                print_help ( );
+                usage ( );
                 return EXIT_FAILURE;
             default:
                 break;
@@ -88,6 +86,14 @@ int main ( int argc, char *argv [ ] )
         exit ( EXIT_SUCCESS );
     }
 
+    /* Check mount point is supplied */
+    if ( argc != 2 )
+    {
+        /* fprintf(stderr, "Usage: %s MOUNT\n", argv[0]); */
+	usage();
+        exit ( EXIT_FAILURE );
+    }
+
     /* initialize yashigani stuff */
     yashigani_init ( 1 );
 
@@ -98,12 +104,6 @@ int main ( int argc, char *argv [ ] )
         puts ( "--------" );
         print_list ( &yashigani_lib_obj );
         exit ( EXIT_SUCCESS );
-    }
-    /* Check mount point is supplied */
-    if ( argc != 2 )
-    {
-        fprintf(stderr, "Usage: %s MOUNT\n", argv[0]);
-        exit ( EXIT_FAILURE );
     }
 
     printf("Press enter key to terminate.\n");

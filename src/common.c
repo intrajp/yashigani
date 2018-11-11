@@ -1,5 +1,5 @@
 /*
- *  common.c - common definition 
+ *  common.c - common functions 
  *  This file contains the contents of yashigani.
  *
  *  Copyright (C) 2018 Shintaro Fujiwara
@@ -20,14 +20,8 @@
  *  02110-1301 USA
  */
 
-#include <ctype.h> /* for is_space */
-#include <errno.h>
-#include <limits.h>
-#include <time.h> 
 #include <openssl/sha.h>
 #include <openssl/rand.h>
-#include <string.h>
-#include <unistd.h> 
 #include "common.h"
 
 char procfd_path_echo [ PATH_MAX ];

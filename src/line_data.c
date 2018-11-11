@@ -20,7 +20,7 @@
  * 02110-1301 USA
  */
 
-#include "common.h"
+#include "line_data.h"
 
 int init_list ( node **obj )
 {
